@@ -13,9 +13,9 @@ from sklearn.model_selection import train_test_split
 
 def make_word_set(words_file):
     words_set = set()
-    with open(words_file, 'r') as fp:
+    with open(words_file, 'r',encoding='utf-8') as fp:
         for line in fp.readlines():
-            word = line.strip().decode("utf-8")
+            word = line.strip()
             if len(word) > 0 and word not in words_set:  # 去重
                 words_set.add(word)
     return words_set
@@ -77,6 +77,8 @@ def text_processing(folder_path, test_size=0.2):
     # # key函数利用词频进行降序排序
     all_words_tuple_list = sorted(all_words_dict.items(), key=lambda f: f[1], reverse=True)  # 内建函数sorted参数需为list
     all_words_list = list(list(zip(*all_words_tuple_list))[0])
+    # print(test_data_list)
+    # print(test_class_list)
     return all_words_list, train_data_list, test_data_list, train_class_list, test_class_list
 
 
@@ -85,8 +87,8 @@ def words_dict(all_words_list, deleteN, stopwords_set=set()):
     feature_words = []
     n = 1
     for t in range(deleteN, len(all_words_list), 1):
-        if n > 1000:  # feature_words的维度1000
-            break
+        # if n > 1000:  # feature_words的维度1000
+        #     break
         if not all_words_list[t].isdigit() and all_words_list[t] not in stopwords_set and 1 < len(
                 all_words_list[t]) < 5:
             feature_words.append(all_words_list[t])
@@ -111,6 +113,13 @@ def text_features(train_data_list, test_data_list, feature_words, flag='nltk'):
     test_feature_list = [text_features(text, feature_words) for text in test_data_list]
     return train_feature_list, test_feature_list
 
+# feature_words = ['这', '是', '一次', '跨越', '世纪', '的', '重逢', '', '', '这', '是', '一次', '弥补', '历史', '的', '棋坛', '盛事', '', '5', '月', '23', '日', '至', '27', '日', '', '', '在', '美丽', '的', '沈阳', '阳世', '世博', '世博园', '博园']
+# train_data_list=[['这', '是', '一次', '跨越', '世纪', '的', '重逢'],['在', '美丽', '的', '沈阳', '阳世', '世博', '世博园', '博园']]
+# test_data_list=[['今天', '是', '个', '高兴', '的', '日子'],['弥补', '历史', '的', '棋坛', '盛事']]
+# text_features(train_data_list,test_data_list,feature_words,flag='sklearn')
+
+
+
 def text_classifier(train_feature_list, test_feature_list, train_class_list, test_class_list, flag='nltk'):
     ## -----------------------------------------------------------------------------------
     if flag == 'nltk':
@@ -121,8 +130,10 @@ def text_classifier(train_feature_list, test_feature_list, train_class_list, tes
         test_accuracy = nltk.classify.accuracy(classifier, test_flist)
     elif flag == 'sklearn':
         ## sklearn分类器
+        # classifier = MultinomialNB(alpha=2.0,fit_prior=True).fit(train_feature_list, train_class_list)
         classifier = MultinomialNB().fit(train_feature_list, train_class_list)
-        test_accuracy = classifier.score(test_feature_list, test_class_list)
+        # test_accuracy = classifier.score(test_feature_list, test_class_list)
+        test_accuracy = classifier.predict(['科技','电脑','人工智能','机器','戴尔','电子游戏','飞行器','联想','易趣网'])
     else:
         test_accuracy = []
     return test_accuracy
@@ -137,12 +148,13 @@ if __name__ == '__main__':
     all_words_list, train_data_list, test_data_list, train_class_list, test_class_list = text_processing(folder_path,
                                                                                                          test_size=0.2)
 
-    # 生成stopwords_set
+    # # 生成stopwords_set
     stopwords_file = './stopwords_cn.txt'
     stopwords_set = make_word_set(stopwords_file)
 
-    ## 文本特征提取和分类
-    # flag = 'nltk'
+    #
+    # ## 文本特征提取和分类
+    # # flag = 'nltk'
     flag = 'sklearn'
     deleteNs = range(0, 1000, 20)
     test_accuracy_list = []
@@ -153,16 +165,16 @@ if __name__ == '__main__':
         test_accuracy = text_classifier(train_feature_list, test_feature_list, train_class_list, test_class_list, flag)
         test_accuracy_list.append(test_accuracy)
     print (test_accuracy_list)
-
-    # 结果评价
+    #
+    # # 结果评价
     # plt.figure()
-    plt.plot(deleteNs, test_accuracy_list)
-    plt.title('Relationship of deleteNs and test_accuracy')
-    plt.xlabel('deleteNs')
-    plt.ylabel('test_accuracy')
-    plt.show()
-    # plt.savefig('result.png')
-
+    # plt.plot(deleteNs, test_accuracy_list)
+    # plt.title('Relationship of deleteNs and test_accuracy')
+    # plt.xlabel('deleteNs')
+    # plt.ylabel('test_accuracy')
+    # plt.show()
+    # # plt.savefig('result.png')
+    #
     print ("finished")
 
-    tx=text_processing(r'D:\MyProj\NLP\text classificition\NaiveBayes\Database\SogouC\Sample')
+    # tx=text_processing(r'D:\MyProj\NLP\text classificition\NaiveBayes\Database\SogouC\Sample')
