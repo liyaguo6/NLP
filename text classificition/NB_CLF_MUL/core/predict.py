@@ -1,6 +1,6 @@
 import pickle
 import jieba  # 处理中文
-from NB_CLF_MUL.settings import setting
+from Tex_classfication.settings import setting
 from sklearn.naive_bayes import MultinomialNB  # 多项式分类
 import numpy as np
 import collections
@@ -13,8 +13,7 @@ class Predict:
             self.features_words = pickle.load(f)
         with open(setting.TRAIN_FEATURES, 'rb') as f:
             self.train_features = pickle.load(f)
-        with open(setting.TRAIN_CLASS, 'rb') as f:
-            self.train_class = pickle.load(f)
+        self.train_class = [1,0]
 
     def text_processing(self, text):
         text_words_list = list(jieba.cut(text, cut_all=True))
@@ -31,10 +30,8 @@ class Predict:
 
 
 if __name__ == '__main__':
-    text = """
-    双卡双待在中国市场是一个比较广泛的需求，目前大多数安卓手机基本具备这一功能。此前早就有声音呼吁苹果针对中国市场推出双卡双待功能，此次发布会前也有猜测苹果将推出这一功能，而最终传闻成真。
-    """
-    # p = Predict(text=text)
-    p = Predict(**{'text':text})
+    text = """今天你要多穿点衣服，因为天气很冷，我打算去医院看看"""
+    p = Predict(text=text)
+    # p = Predict(**{'text':text})
     ret = p.predict()
     print(ret)
